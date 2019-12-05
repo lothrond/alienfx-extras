@@ -1,0 +1,34 @@
+#!/bin/bash
+
+if [ $# -eq 1 ]; then
+	BACKLIGHT_THEME="$1"
+fi
+
+# Placeholder value for toggle
+[ $BACKLIGHT_STATFILE ] || \
+	BACKLIGHT_STATFILE=/tmp/tmp.backlight
+
+# alienfx backlight theme
+[ $BACKLIGHT_THEME ] || \
+    BACKLIGHT_THEME=blue
+
+# alienfx-toggle value
+if [ ! -f $BACKLIGHT_STATFILE ]; then
+    touch $BACKLIGHT_STATFILE
+fi
+
+# alienfx config
+CONFIGDIR=~/.config/alienfx
+
+# check theme
+if ! ls $CONFIGDIR | grep -q "$BACKLIGHT_THEME"; then
+	echo "Failed to find backlight theme: $BACKLIGHT_THEME in CONFIGDIR"
+	echo "(Does $CONFIGDIR/${BACKLIGHT_THEME}.json exist?)"
+	echo "exiting with NOTHEME..."
+	echo "NOTHEME" > $BACKLIGHT_STATFILE
+	exit 1
+fi
+
+# set backlight theme on user login (desktop,multi-user,etc)
+alienfx -t $BACKLIGHT_THEME && echo "ON" > $BACKLIGHT_STATFILE
+

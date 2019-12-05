@@ -1,0 +1,47 @@
+#!/bin/bash
+
+## BEGIN DEFAULT ENVIRONMENT
+
+[ $BACKLIGHT_STATFILE ] || BACKLIGHT_STATFILE=/tmp/tmp.backlight
+[ $BACKLIGHT_THEME ] || BACKLIGHT_THEME=blue
+
+## END DEFAULT ENVIRONMENT
+
+backlight_status=$(cat $BACKLIGHT_STATFILE)
+
+if [ "$backlight_status" == "ON" ]; then
+    # toggle backlight off
+    alienfx -t off >& /dev/null
+    echo "OFF" > $BACKLIGHT_STATFILE
+elif [ "$backlight_status" == "OFF" ]; then
+    # toggle backlight on
+    alienfx -t $BACKLIGHT_THEME >& /dev/null
+    echo "ON" > $BACKLIGHT_STATFILE
+elif [ "$backlight_status" == "NOTHEME" ]; then
+	# invalid backlight theme
+	echo "Not a valid theme: $BACKLIGHT_THEME"
+	echo "Please change your \$BACKLIGHT_THEME to something valid!"
+	echo
+	echo "To get a listing of all valid themes in ~/.config/alienfx,"
+	echo "run this command:"
+	echo
+	echo "   alienfx -l"
+	echo
+	echo "Once you have/create your theme,"
+	echo "be sure to export it before re-running this command."
+	echo "This is done by running this command:"
+	echo
+	echo "   export BACKLIGHT_THEME=theme"
+	echo
+	echo "where 'theme' is the theme in question."
+	echo
+	echo "(You can always put the above in your .bashrc, .zshrc, etc.)"
+	echo "exiting..."
+	exit 1
+else
+	# invalid toggle value
+    echo "Invalid data in ${BACKLIGHT_STATFILE}..."
+    exit 1
+fi
+
+exit $?
